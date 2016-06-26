@@ -38,6 +38,8 @@ class InstallController extends InstallAppController {
 		$this->layout = 'Install.default';
 
 		$this->InstallUtil = new InstallUtil();
+
+		$this->Components->unload('NetCommons.Permission');
 	}
 
 /**
