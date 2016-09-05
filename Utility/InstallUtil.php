@@ -13,6 +13,7 @@ App::uses('CakePlugin', 'Core');
 App::uses('File', 'Utility');
 App::uses('Current', 'NetCommons.Utility');
 App::uses('Security', 'Utility');
+App::uses('ClassRegistry', 'Utility');
 
 /**
  * Install Utility
@@ -22,6 +23,20 @@ App::uses('Security', 'Utility');
  * @SuppressWarnings(PHPMD.LongVariable)
  */
 class InstallUtil {
+
+/**
+ * application.ymlのプレフィックス(Unitテストで使用する)
+ *
+ * @return array
+ */
+	public $appYmlPrefix = '';
+
+/**
+ * application.ymlのプレフィックス(Unitテストで使用する)
+ *
+ * @return array
+ */
+	public $useDbConfig = '';
 
 /**
  * Master configuration
@@ -46,18 +61,18 @@ class InstallUtil {
  *
  * @return array
  */
-	public $masterDBPostgresql = array(
-		'datasource' => 'Database/Postgres',
-		'persistent' => false,
-		'host' => 'localhost',
-		'port' => 5432,
-		'login' => 'postgres',
-		'password' => 'postgres',
-		'database' => 'nc3',
-		'prefix' => '',
-		'schema' => 'public',
-		'encoding' => 'utf8',
-	);
+	//public $masterDBPostgresql = array(
+	//	'datasource' => 'Database/Postgres',
+	//	'persistent' => false,
+	//	'host' => 'localhost',
+	//	'port' => 5432,
+	//	'login' => 'postgres',
+	//	'password' => 'postgres',
+	//	'database' => 'nc3',
+	//	'prefix' => '',
+	//	'schema' => 'public',
+	//	'encoding' => 'utf8',
+	//);
 
 /**
  * DB configuration for travis
@@ -82,18 +97,18 @@ class InstallUtil {
  *
  * @return array
  */
-	public $travisDBPostgresql = array(
-		'datasource' => 'Database/Postgres',
-		'persistent' => false,
-		'host' => 'localhost',
-		'port' => 5432,
-		'login' => 'postgres',
-		'password' => 'postgres',
-		'database' => 'cakephp_test',
-		'prefix' => '',
-		'schema' => 'public',
-		'encoding' => 'utf8',
-	);
+	//public $travisDBPostgresql = array(
+	//	'datasource' => 'Database/Postgres',
+	//	'persistent' => false,
+	//	'host' => 'localhost',
+	//	'port' => 5432,
+	//	'login' => 'postgres',
+	//	'password' => 'postgres',
+	//	'database' => 'cakephp_test',
+	//	'prefix' => '',
+	//	'schema' => 'public',
+	//	'encoding' => 'utf8',
+	//);
 
 /**
  * Master configuration
@@ -118,18 +133,18 @@ class InstallUtil {
  *
  * @return array
  */
-	public $masterTestDBPostgresql = array(
-		'datasource' => 'Database/Postgres',
-		'persistent' => false,
-		'host' => 'localhost',
-		'port' => 5432,
-		'login' => 'postgres',
-		'password' => 'postgres',
-		'database' => 'test_nc3',
-		'prefix' => '',
-		'schema' => 'public',
-		'encoding' => 'utf8',
-	);
+	//public $masterTestDBPostgresql = array(
+	//	'datasource' => 'Database/Postgres',
+	//	'persistent' => false,
+	//	'host' => 'localhost',
+	//	'port' => 5432,
+	//	'login' => 'postgres',
+	//	'password' => 'postgres',
+	//	'database' => 'test_nc3',
+	//	'prefix' => '',
+	//	'schema' => 'public',
+	//	'encoding' => 'utf8',
+	//);
 
 /**
  * DB configuration for travis
@@ -154,18 +169,18 @@ class InstallUtil {
  *
  * @return array
  */
-	public $travisTestDBPostgresql = array(
-		'datasource' => 'Database/Postgres',
-		'persistent' => false,
-		'host' => 'localhost',
-		'port' => 5432,
-		'login' => 'postgres',
-		'password' => 'postgres',
-		'database' => 'cakephp_test',
-		'prefix' => '',
-		'schema' => 'public',
-		'encoding' => 'utf8',
-	);
+	//public $travisTestDBPostgresql = array(
+	//	'datasource' => 'Database/Postgres',
+	//	'persistent' => false,
+	//	'host' => 'localhost',
+	//	'port' => 5432,
+	//	'login' => 'postgres',
+	//	'password' => 'postgres',
+	//	'database' => 'cakephp_test',
+	//	'prefix' => '',
+	//	'schema' => 'public',
+	//	'encoding' => 'utf8',
+	//);
 
 /**
  * 管理プラグイン
@@ -191,6 +206,12 @@ class InstallUtil {
  */
 	public function __construct() {
 		Security::setHash('sha512');
+
+		$DatabaseConfig = ClassRegistry::init('Install.DatabaseConfiguration', true);
+		$this->useDbConfig = $DatabaseConfig->useDbConfig;
+		if ($DatabaseConfig->useDbConfig === 'test') {
+			$this->appYmlPrefix = 'test_';
+		}
 
 		//デフォルトの言語
 		Configure::write('Config.language', 'ja');
@@ -229,7 +250,7 @@ class InstallUtil {
  * @return bool File written or not
  */
 	public function saveAppConf() {
-		$file = new File(APP . 'Config' . DS . 'application.yml', true);
+		$file = new File(APP . 'Config' . DS . $this->appYmlPrefix . 'application.yml', true);
 		$conf = $this->__arrayFilterRecursive(Configure::read(), function ($val) {
 			return !is_object($val);
 		});
@@ -254,15 +275,15 @@ class InstallUtil {
 			$db = 'master' . ucfirst($env) . 'DB';
 		}
 
-		if (isset($_SERVER['DB'])) {
-			if ($_SERVER['DB'] === 'pgsql') {
-				$db .= 'Postgresql';
-			} else {
-				$db .= 'Mysql';
-			}
-		} else {
+		//if (isset($_SERVER['DB'])) {
+		//	if ($_SERVER['DB'] === 'pgsql') {
+		//		$db .= 'Postgresql';
+		//	} else {
+		//		$db .= 'Mysql';
+		//	}
+		//} else {
 			$db .= 'Mysql';
-		}
+		//}
 
 		return $this->$db;
 	}
@@ -283,7 +304,7 @@ class InstallUtil {
 		$params['database'] .= '_test';
 		$conf = $this->__parseDBConf($conf, $params, 'test');
 
-		$file = new File(APP . 'Config' . DS . 'database.php', true);
+		$file = new File(APP . 'Config' . DS . $this->appYmlPrefix . 'database.php', true);
 		return $file->write($conf);
 	}
 
@@ -297,9 +318,13 @@ class InstallUtil {
  */
 	private function __parseDBConf($conf, $params, $dbPrefix) {
 		foreach ($params as $key => $value) {
-			$value = ($value === null) ? 'null' : $value;
-			$value = ($value === true) ? 'true' : $value;
-			$value = ($value === false) ? 'false' : $value;
+			if ($value === null) {
+				$value = 'null';
+			} elseif ($value === true) {
+				$value = 'true';
+			} elseif ($value === false) {
+				$value = 'false';
+			}
 			$conf = str_replace(sprintf('{' . $dbPrefix . '_%s}', $key), $value, $conf);
 		}
 
@@ -368,7 +393,7 @@ EOF;
 			$database = preg_replace('/[^a-zA-Z0-9_\-]/', '', $configuration['database']);
 			if ($configuration['datasource'] === 'Database/Mysql') {
 				$encoding = preg_replace('/[^a-zA-Z0-9_\-]/', '', 'utf8mb4');
-			} else {
+				//} else {
 				///* $encoding = preg_replace('/[^a-zA-Z0-9_\-]/', '', $configuration['encoding']); */
 				//$encoding = preg_replace('/[^a-zA-Z0-9_\-]/', '', 'utf8');
 			}
@@ -391,15 +416,11 @@ EOF;
 				//		)
 				//	);
 				//	break;
-				default:
-					CakeLog::error(sprintf('Unknown datasource %s', $configuration['datasource']));
-					return false;
 			}
 			if ($result) {
 				CakeLog::info(
 					sprintf('Database %s for %s created successfully', $database, $configuration['datasource'])
 				);
-				return true;
 			} else {
 				CakeLog::info(
 					sprintf('Database %s for %s created failure', $database, $configuration['datasource'])
@@ -410,6 +431,8 @@ EOF;
 			CakeLog::error($e->getMessage());
 			return false;
 		}
+
+		return true;
 	}
 
 /**
@@ -458,17 +481,22 @@ EOF;
  * マイグレーション実行
  *
  * @param string $connection 接続先
+ * @param array $addPlugins 追加するプラグイン
  * @return bool Install succeed or not
  */
-	public function installMigrations($connection = 'master') {
+	public function installMigrations($connection = 'master', $addPlugins = array()) {
 		$plugins = array_unique(array_merge(
 			array(
 				'Files', 'Users', 'NetCommons', 'M17n', 'DataTypes', 'PluginManager',
 				'Roles', 'Mails', 'SiteManager', 'Blocks'
 			),
-			App::objects('plugins'),
-			array_map('basename', glob(ROOT . DS . 'app' . DS . 'Plugin' . DS . '*', GLOB_ONLYDIR))
+			$addPlugins
 		));
+
+		//Unitテストの時、強制的にtestに変換する。
+		if ($this->useDbConfig === 'test') {
+			$connection = 'test';
+		}
 
 		// Invoke all available migrations
 		CakeLog::info('[Migrations.migration] Start migrating all plugins');
@@ -489,24 +517,21 @@ EOF;
 
 			// Write logs
 			if ($ret) {
-				$matches = preg_grep('/No migrations available/', $messages);
-				if ($ret) {
-					$matches = preg_grep('/No migrations/', $messages);
-					if (count($matches) === 0) {
-						CakeLog::info(
-							sprintf('[migration] Failure migrated %s for %s connection', $plugin, $connection)
-						);
-						$result = false;
-					} else {
-						CakeLog::info(
-							sprintf('[migration] Successfully migrated %s for %s connection', $plugin, $connection)
-						);
-					}
+				$matches = preg_grep('/No migrations/', $messages);
+				if (count($matches) === 0) {
+					CakeLog::info(
+						sprintf('[migration] Failure migrated %s for %s connection', $plugin, $connection)
+					);
+					$result = false;
 				} else {
 					CakeLog::info(
 						sprintf('[migration] Successfully migrated %s for %s connection', $plugin, $connection)
 					);
 				}
+			} else {
+				CakeLog::info(
+					sprintf('[migration] Successfully migrated %s for %s connection', $plugin, $connection)
+				);
 			}
 			$this->__commandOutputResults('migration', $messages);
 		}
@@ -604,7 +629,7 @@ EOF;
 	}
 
 /**
- * コマンド実行結果をログ委に出力
+ * コマンド実行結果をログに出力
  *
  * @param string $type タイプ `bower` or `migration`
  * @param array $messages コマンド実行結果

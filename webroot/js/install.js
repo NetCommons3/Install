@@ -21,11 +21,7 @@ $(document).ready(function() {
     }
   });
 
-  // Hook submit
-  var timer;
   $('#DatabaseConfigurationInitDbForm').on('submit', function(event) {
-    event.preventDefault();
-    event.stopPropagation();
     var dialog = $('div.loader').dialog({
       modal: true,
       resizable: false,
@@ -43,45 +39,6 @@ $(document).ready(function() {
     dialog.removeClass('hidden');
     $('.ui-dialog-titlebar-close').remove();
 
-    // Submit form
-    $.ajax({
-      url: $('#DatabaseConfigurationInitDbForm').attr('action'),
-      type: 'post',
-      data: $(this).serialize(),
-      timeout: 3600000, // 1 hour
-      beforeSubmit: function() {
-      },
-      success: function() {
-        clearInterval(timer);
-        location.href = $('#DatabaseConfigurationInitDbForm')
-                            .attr('action')
-                            .replace(/init_db$/, 'init_admin_user');
-      },
-      error: function(xhr) {
-        var dom = $.parseHTML(xhr.responseText);
-        if ($('div.alert').length) {
-          $('div.alert').html($(dom).filter('div.alert').html());
-        } else {
-          $('#DatabaseConfigurationInitDbForm').before(
-              '<div class="alert alert-danger alert-dismissable">' +
-              $(dom).filter('div.alert').html() +
-              '/<div> '
-          );
-        }
-        dialog.dialog('close');
-        clearInterval(timer);
-      }
-    });
-
-    // Register ping timer
-    timer = setInterval(function() {
-      $.ajax({
-        url: '/install/ping.json',
-        type: 'get',
-        cache: false
-      });
-    }, 10000);
-
-    return false;
+    return true;
   });
 });

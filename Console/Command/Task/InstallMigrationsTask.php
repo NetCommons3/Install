@@ -41,7 +41,11 @@ class InstallMigrationsTask extends InstallAppTask {
 			$connection = 'master';
 		}
 
-		if (! $this->InstallUtil->installMigrations($connection)) {
+		$plugins = array_unique(array_merge(
+			App::objects('plugins'),
+			array_map('basename', glob(ROOT . DS . 'app' . DS . 'Plugin' . DS . '*', GLOB_ONLYDIR))
+		));
+		if (! $this->InstallUtil->installMigrations($connection, $plugins)) {
 			return $this->error(__d('install', 'Failed to install migrations.'));
 		}
 	}

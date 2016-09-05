@@ -170,16 +170,5 @@ msgstr "パーミッションチェック"
 msgid "Failed to install migrations."
 msgstr "テーブルの生成（マイグレーション）に失敗しました。"
 
-msgid "notEmpty"
-msgstr ""
-
-msgid "numeric"
-msgstr "数値"
-
-msgid "boolean"
-msgstr "真偽値"
-
-#: Model/UserInvitation.php:validation for field email
-#: /home/netcommons/usr/local/src/NetCommons3/plugins/Users/Model/User.php:validation
-msgid "email"
-msgstr "メール"
+msgid "Only alphabets and numbers are allowed."
+msgstr "半角英数字または記号(_のみ利用可)を入力してください。"

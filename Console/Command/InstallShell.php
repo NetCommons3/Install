@@ -57,9 +57,12 @@ class InstallShell extends AppShell {
 		}
 
 		$this->out(__d('install', '[S]tart'));
+		$this->out(__d('install', '[H]elp'));
 		$this->out(__d('install', '[Q]uit'));
 
-		$choice = strtolower($this->in(__d('install', 'What would you like to do?'), ['S', 'Q'], 'Q'));
+		$choice = strtolower(
+			$this->in(__d('net_commons', 'What would you like to do?'), ['S', 'H', 'Q'], 'Q')
+		);
 		switch ($choice) {
 			case 's':
 				$this->InstallStart->execute();
@@ -72,12 +75,15 @@ class InstallShell extends AppShell {
 
 				$this->out('<success>' . __d('install', 'Install success.') . '</success>');
 				return $this->_stop();
+			case 'h':
+				$this->out($this->getOptionParser()->help());
+				break;
 			case 'q':
 				return $this->_stop();
 			default:
 				$this->out(
-					__d('cake_console', 'You have made an invalid selection. ' .
-										'Please choose a command to execute by entering S, or Q.')
+					__d('net_commons', 'You have made an invalid selection. ' .
+								'Please choose a command to execute by entering %s.', '[S, H, Q]')
 				);
 		}
 		$this->hr();

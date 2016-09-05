@@ -42,6 +42,9 @@
 					'/components/jquery/dist/jquery.min.js',
 					'/components/jqueryui/jquery-ui.min.js',
 					'/components/bootstrap/dist/js/bootstrap.min.js',
+					'/components/angular/angular.min.js',
+					'/components/angular-bootstrap/ui-bootstrap-tpls.min.js',
+					'/net_commons/js/base.js',
 					'/net_commons/jquery.cookie.js'
 				),
 				array('plugin' => false)
@@ -49,14 +52,9 @@
 			echo $this->fetch('script');
 		?>
 	</head>
-	<body>
+
+	<body ng-controller="NetCommons.base">
 		<div class="container">
-			<?php if ($flashMss = $this->Session->flash()) { ?>
-				<div class="alert alert-danger alert-dismissable">
-					<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-					<?php echo $flashMss ?>
-				</div>
-			<?php } ?>
 			<?php echo $this->fetch('content'); ?>
 		</div>
 

@@ -30,106 +30,126 @@ class DatabaseConfiguration extends AppModel {
  *
  * @var array
  */
-	public $validate = array(
-		'datasource' => array(
-			'notBlank' => array(
-				'rule' => array('notBlank'),
-				'message' => 'Invalid value',
-				//'allowEmpty' => false,
-				'required' => true,
-				//'last' => false, // Stop validation after this rule
-				//'on' => 'create', // Limit validation to 'create' or 'update' operations
+	public $validate = array();
+
+/**
+ * Called during validation operations, before validation. Please note that custom
+ * validation rules can be defined in $validate.
+ *
+ * @param array $options Options passed from Model::save().
+ * @return bool True if validate operation should continue, false to abort
+ * @link http://book.cakephp.org/2.0/en/models/callback-methods.html#beforevalidate
+ * @see Model::save()
+ * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+ */
+	public function beforeValidate($options = array()) {
+		$this->validate = Hash::merge($this->validate, array(
+			'datasource' => array(
+				'notBlank' => array(
+					'rule' => array('notBlank'),
+					'message' => __d('net_commons', 'Invalid request.'),
+					'required' => true,
+				),
+				'inList' => array(
+					'rule' => array('inList', array('Database/Mysql', 'Database/Postgres')),
+					'message' => __d('net_commons', 'Invalid request.'),
+				)
 			),
-			'allowedChoice' => array(
-				'rule' => array('inList', array('Database/Mysql', 'Database/Postgres')),
-				/* 'message' => 'Invalid value', */
-			)
-		),
-		'persistent' => array(
-			'boolean' => array(
-				'rule' => array('boolean'),
-				'message' => 'Invalid value',
-				//'allowEmpty' => false,
-				//'required' => true,
-				//'last' => false, // Stop validation after this rule
-				//'on' => 'create', // Limit validation to 'create' or 'update' operations
+			'persistent' => array(
+				'boolean' => array(
+					'rule' => array('boolean'),
+					'message' => __d('net_commons', 'Invalid request.'),
+				),
 			),
-		),
-		'host' => array(
-			'regex' => array(
-				'rule' => array('custom', '/[\w\.]+/'),
-				'message' => 'Invalid value',
-				//'allowEmpty' => false,
-				'required' => true,
-				//'last' => false, // Stop validation after this rule
-				//'on' => 'create', // Limit validation to 'create' or 'update' operations
+			'host' => array(
+				'notBlank' => array(
+					'rule' => array('notBlank'),
+					'message' => sprintf(
+						__d('net_commons', 'Please input %s.'), __d('install', 'Host')
+					),
+					'required' => true,
+				),
+				'regex' => array(
+					'rule' => array('custom', '/[\w' . preg_quote('!#%&()*+,-./;<=>?@[]^_{|}~', '/') . ']+$/'),
+					'message' => __d('net_commons', 'Only alphabets and numbers are allowed.'),
+					'required' => true,
+				),
 			),
-		),
-		'port' => array(
-			'between' => array(
-				'rule' => array('between', 0, 65535),
-				'message' => 'Invalid value',
-				//'message' => 'Your custom message here',
-				//'allowEmpty' => false,
-				//'required' => false,
-				//'last' => false, // Stop validation after this rule
-				//'on' => 'create', // Limit validation to 'create' or 'update' operations
+			'port' => array(
+				'notBlank' => array(
+					'rule' => array('notBlank'),
+					'message' => sprintf(
+						__d('net_commons', 'Please input %s.'), __d('install', 'Port')
+					),
+					'required' => true,
+				),
+				'numeric' => array(
+					'rule' => array('range', -1, 65536),
+					'message' => sprintf(
+						__d('net_commons', 'The input %s must be a number bigger than %d and less than %d.'),
+						__d('install', 'Port'),
+						0,
+						65535
+					),
+				),
 			),
-		),
-		'database' => array(
-			'custom' => array(
-				'rule' => array('custom', '/[\w]+/'),
-				'message' => 'Invalid value',
-				//'message' => 'Your custom message here',
-				//'allowEmpty' => false,
-				//'required' => false,
-				//'last' => false, // Stop validation after this rule
-				//'on' => 'create', // Limit validation to 'create' or 'update' operations
+			'database' => array(
+				'notBlank' => array(
+					'rule' => array('notBlank'),
+					'message' => sprintf(
+						__d('net_commons', 'Please input %s.'), __d('install', 'Database')
+					),
+					'required' => true,
+				),
+				'regex' => array(
+					'rule' => array('custom', '/^[\w]+$/'),
+					'message' => __d('install', 'Only alphabets and numbers are allowed.'),
+				),
 			),
-		),
-		'schema' => array(
-			'custom' => array(
-				'rule' => array('custom', '/[\w]+/'),
-				'message' => 'Invalid value',
-				//'message' => 'Your custom message here',
-				'allowEmpty' => true,
-				//'required' => false,
-				//'last' => false, // Stop validation after this rule
-				//'on' => 'create', // Limit validation to 'create' or 'update' operations
+			//'schema' => array(
+			//	'regex' => array(
+			//		'rule' => array('custom', '/^[\w]+$/'),
+			//		'message' => __d('net_commons', 'Only alphabets and numbers are allowed.'),
+			//		'allowEmpty' => true,
+			//	),
+			//),
+			'prefix' => array(
+				'regex' => array(
+					'rule' => array('custom', '/^[\w]+$/'),
+					'message' => __d('install', 'Only alphabets and numbers are allowed.'),
+					'allowEmpty' => true,
+				),
 			),
-		),
-		'prefix' => array(
-			'custom' => array(
-				'rule' => array('custom', '/[\w]+/'),
-				'message' => 'Invalid value',
-				//'message' => 'Your custom message here',
-				'allowEmpty' => true,
-				//'required' => false,
-				//'last' => false, // Stop validation after this rule
-				//'on' => 'create', // Limit validation to 'create' or 'update' operations
+			'login' => array(
+				'notBlank' => array(
+					'rule' => array('notBlank'),
+					'message' => sprintf(
+						__d('net_commons', 'Please input %s.'), __d('install', 'Login')
+					),
+					'required' => true,
+				),
+				'regex' => array(
+					'rule' => array('custom', '/[\w' . preg_quote('!#%&()*+,-./;<=>?@[]^_{|}~', '/') . ']+$/'),
+					'message' => __d('net_commons', 'Only alphabets and numbers are allowed.'),
+					'required' => true,
+				),
 			),
-		),
-		'login' => array(
-			'regex' => array(
-				'rule' => array('custom', '/[\w]+/'),
-				'message' => 'Invalid value',
-				//'message' => 'Your custom message here',
-				//'allowEmpty' => false,
-				'required' => true,
-				//'last' => false, // Stop validation after this rule
-				//'on' => 'create', // Limit validation to 'create' or 'update' operations
+			'password' => array(
+				'notBlank' => array(
+					'rule' => array('notBlank'),
+					'message' => sprintf(
+						__d('net_commons', 'Please input %s.'), __d('install', 'Password')
+					),
+					'required' => true,
+				),
+				'regex' => array(
+					'rule' => array('custom', '/[\w' . preg_quote('!#%&()*+,-./;<=>?@[]^_{|}~', '/') . ']+$/'),
+					'message' => __d('net_commons', 'Only alphabets and numbers are allowed.'),
+					'allowEmpty' => true,
+				),
 			),
-		),
-		'password' => array(
-			'regex' => array(
-				'rule' => array('custom', '/[\w]+/'),
-				'message' => 'Invalid value',
-				//'message' => 'Your custom message here',
-				'allowEmpty' => true,
-				//'required' => true,
-				//'last' => false, // Stop validation after this rule
-				//'on' => 'create', // Limit validation to 'create' or 'update' operations
-			),
-		),
-	);
+		));
+
+		return parent::beforeValidate($options);
+	}
 }

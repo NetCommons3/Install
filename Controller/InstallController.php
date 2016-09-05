@@ -20,9 +20,20 @@ App::uses('InstallUtil', 'Install.Utility');
 class InstallController extends InstallAppController {
 
 /**
+ * Model name
+ *
+ * @var array
+ */
+	public $uses = array(
+		'Install.DatabaseConfiguration',
+	);
+
+/**
  * Helpers
  */
-	public $helpers = array('M17n.M17n');
+	public $helpers = array(
+		'M17n.M17n',
+	);
 
 /**
  * beforeFilter
@@ -32,12 +43,15 @@ class InstallController extends InstallAppController {
  */
 	public function beforeFilter() {
 		if (Configure::read('NetCommons.installed')) {
-			throw new NotFoundException;
+			throw new NotFoundException();
 		}
 		$this->Auth->allow();
 		$this->layout = 'Install.default';
 
-		$this->InstallUtil = new InstallUtil();
+		//テストのために必要
+		if (substr(get_class($this->InstallUtil), 0, strlen('Mock_')) !== 'Mock_') {
+			$this->InstallUtil = new InstallUtil();
+		}
 
 		$this->Components->unload('NetCommons.Permission');
 	}
@@ -142,10 +156,7 @@ class InstallController extends InstallAppController {
 		$this->set('masterDB', $this->InstallUtil->chooseDBByEnvironment());
 		$this->set('errors', array());
 		if ($this->request->is('post')) {
-			// タイムアウトはっせいするなら適宜設定
 			set_time_limit(1800);
-
-			$this->loadModel('Install.DatabaseConfiguration');
 
 			if ($this->request->data['DatabaseConfiguration']['prefix'] &&
 					substr($this->request->data['DatabaseConfiguration']['prefix'], -1, 1) !== '_') {
@@ -157,8 +168,13 @@ class InstallController extends InstallAppController {
 				$this->InstallUtil->saveDBConf($this->request->data['DatabaseConfiguration']);
 			} else {
 				$this->response->statusCode(400);
-				CakeLog::info(sprintf('Validation error: %s',
-				implode(', ', array_keys($this->DatabaseConfiguration->validationErrors))));
+				$this->set('errors', [
+					__d('net_commons', 'Failed on validation errors. Please check the input data.')
+				]);
+				CakeLog::info('[ValidationErrors] ' . $this->request->here());
+				if (Configure::read('debug')) {
+					CakeLog::info(var_export($this->DatabaseConfiguration->validationErrors, true));
+				}
 				return;
 			}
 
@@ -169,10 +185,12 @@ class InstallController extends InstallAppController {
 				return;
 			}
 
-			//$update = isset($this->request->data['update']);
-
 			// Install migrations
-			if (!$this->InstallUtil->installMigrations('master')) {
+			$plugins = array_unique(array_merge(
+				App::objects('plugins'),
+				array_map('basename', glob(ROOT . DS . 'app' . DS . 'Plugin' . DS . '*', GLOB_ONLYDIR))
+			));
+			if (!$this->InstallUtil->installMigrations('master', $plugins)) {
 				$this->response->statusCode(400);
 				CakeLog::error('Failed to install migrations');
 				$this->set('errors', [__d('install', 'Failed to install migrations.')]);

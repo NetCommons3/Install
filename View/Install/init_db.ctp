@@ -23,7 +23,7 @@ echo $this->NetCommonsHtml->css('/install/css/install.css');
 	</div>
 <?php endforeach; ?>
 <?php
-	echo $this->Form->create('DatabaseConfiguration',
+	echo $this->NetCommonsForm->create('DatabaseConfiguration',
 		array(
 			'url' => array(
 				'plugin' => 'install',
@@ -32,15 +32,12 @@ echo $this->NetCommonsHtml->css('/install/css/install.css');
 			)
 		)
 	);
-
-	// 配布用の場合はコメントにする
-	echo $this->Form->hidden('update', array('name' => 'update'));
 ?>
 	<div class="panel panel-default">
 		<div class="panel-heading"><?php echo __d('install', 'Database Settings'); ?></div>
 		<div class="panel-body">
 			<div class="form-group form-inline">
-				<?php echo $this->Form->input('datasource',
+				<?php echo $this->NetCommonsForm->input('datasource',
 						array(
 							'type' => 'select',
 							'options' => array(
@@ -48,70 +45,58 @@ echo $this->NetCommonsHtml->css('/install/css/install.css');
 								//'Database/Postgres' => 'Postgresql'
 							),
 							'empty' => false,
-							'class' => 'form-control',
-							'label' => array('text' => __d('install', 'Datasource'), 'style' => 'margin-right: 8px;')
+							'label' => __d('install', 'Datasource'),
+							'div' => false
 						)
 					); ?>
 			</div>
-			<div class="form-group">
-				<?php echo $this->Form->input('host',
-						array(
-							'default' => $masterDB['host'],
-							'class' => 'form-control'
-						)
-					); ?>
-			</div>
-			<div class="form-group">
-				<?php echo $this->Form->input('port',
-						array(
-							'default' => $masterDB['port'],
-							'class' => 'form-control'
-						)
-					); ?>
-			</div>
-			<div class="form-group">
-				<?php echo $this->Form->input('database',
-						array(
-							'default' => 'nc3',
-							'class' => 'form-control'
-						)
-					); ?>
-			</div>
-			<div class="form-group<?php echo isset($this->request->data['datasource']) && $this->request->data['datasource'] === 'Database/Postgres' ? '' : ' none'; ?>">
-				<?php echo $this->Form->input('schema',
-						array(
-							'default' => 'public',
-							'class' => 'form-control'
-						)
-					); ?>
-			</div>
-			<div class="form-group">
-				<?php echo $this->Form->input('prefix',
-						array(
-							'placeholder' => 'nc3_',
-							'class' => 'form-control'
-						)
-					); ?>
-			</div>
-			<div class="form-group">
-				<?php echo $this->Form->input('login',
-						array(
-							'label' => __d('install', 'ID'),
-							'class' => 'form-control',
-							'default' => $masterDB['login'],
-							'placeholder' => __d('install', 'Username')
-						)
-					); ?>
-			</div>
-			<div class="form-group">
-				<?php echo $this->Form->input('password',
-						array(
-							'class' => 'form-control',
-							'placeholder' => __d('install', 'Password')
-						)
-					); ?>
-			</div>
+			<?php echo $this->NetCommonsForm->input('host',
+					array(
+						'label' => __d('install', 'Host'),
+						'default' => $masterDB['host'],
+					)
+				); ?>
+			<?php echo $this->NetCommonsForm->input('port',
+					array(
+						'label' => __d('install', 'Port'),
+						'default' => $masterDB['port'],
+					)
+				); ?>
+			<?php echo $this->NetCommonsForm->input('database',
+					array(
+						'label' => __d('install', 'Database'),
+						'default' => 'nc3',
+					)
+				); ?>
+
+			<?php echo $this->NetCommonsForm->hidden('schema',
+					array(
+						'value' => 'public',
+					)
+				); ?>
+
+			<?php echo $this->NetCommonsForm->input('prefix',
+					array(
+						'label' => __d('install', 'Prefix'),
+						'placeholder' => 'nc3_',
+					)
+				); ?>
+			<?php echo $this->NetCommonsForm->input('login',
+					array(
+						'label' => __d('install', 'ID'),
+						'default' => $masterDB['login'],
+						'placeholder' => __d('install', 'Username'),
+					)
+				); ?>
+			<?php echo $this->NetCommonsForm->input('password',
+					array(
+						'label' => __d('install', 'Password'),
+						'placeholder' => __d('install', 'Password'),
+					)
+				); ?>
 		</div>
 	</div>
-	<button class="btn btn-lg btn-primary btn-block" type="submit"><?php echo __d('install', 'Next'); ?></button>
-<?php echo $this->Form->end();
+	<button class="btn btn-lg btn-primary btn-block" type="submit">
+		<?php echo __d('install', 'Next'); ?>
+	</button>
+<?php echo $this->NetCommonsForm->end();
