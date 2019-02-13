@@ -88,17 +88,6 @@ class InstallStartTask extends InstallAppTask {
 			);
 			return $this->error($message);
 		}
-
-		//database.phpの初期化処理
-		$configs = $this->InstallUtil->chooseDBByEnvironment();
-		if (! $this->InstallUtil->saveDBConf($configs)) {
-			$message = __d(
-				'install',
-				'Failed to write %s. Please check permission.',
-				array(APP . 'Config' . DS . 'database.php')
-			);
-			return $this->error($message);
-		}
 	}
 
 /**
