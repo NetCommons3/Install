@@ -608,10 +608,10 @@ EOF;
 			$SiteSetting->setDataSource($connection);
 
 			$conditions = array(
-				'key' => 'Config.language'
+				'SiteSetting.key' => 'Config.language'
 			);
 			$update = array(
-				'value' => '\'' . Configure::read('Config.language') . '\''
+				'SiteSetting.value' => '\'' . Configure::read('Config.language') . '\''
 			);
 			if (! $SiteSetting->updateAll($update, $conditions)) {
 				CakeLog::info(
