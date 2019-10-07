@@ -42,7 +42,8 @@ class InstallController extends InstallAppController {
 		$this->layout = 'Install.default';
 
 		//テストのために必要
-		if (substr(get_class($this->InstallUtil), 0, strlen('Mock_')) !== 'Mock_') {
+		if (empty($this->InstallUtil) ||
+				substr(get_class($this->InstallUtil), 0, strlen('Mock_')) !== 'Mock_') {
 			$this->InstallUtil = new InstallUtil();
 		}
 
