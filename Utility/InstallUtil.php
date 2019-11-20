@@ -210,7 +210,7 @@ class InstallUtil {
  */
 	public $migrationPriorityPlugins = array(
 		'Files', 'Users', 'NetCommons', 'M17n', 'DataTypes', 'PluginManager',
-		'Roles', 'Mails', 'SiteManager', 'Blocks', 'Boxes'
+		'Roles', 'Mails', 'SiteManager', 'Rooms', 'Blocks', 'Boxes'
 	);
 
 /**
