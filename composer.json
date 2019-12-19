@@ -22,11 +22,14 @@
             ]
         }
     },
+    "repositories": [
+        {"type": "vcs", "url": "https://github.com/WillBooster/NC3AuthGeneral.git"}
+    ],
     "require": {
         "cakedc/migrations": "~2.2",
         "netcommons/access-counters": "@dev",
         "netcommons/announcements": "@dev",
-        "netcommons/auth-general": "@dev",
+        "netcommons/auth-general": "dev-availability",
         "netcommons/bbses": "@dev",
         "netcommons/blogs": "@dev",
         "netcommons/cabinets": "@dev",
@@ -37,7 +40,7 @@
         "netcommons/links": "@dev",
         "netcommons/menus": "@dev",
         "netcommons/multidatabases": "@dev",
-        "netcommons/net-commons": "@dev",
+        "netcommons/net-commons": "dev-availability",
         "netcommons/photo-albums": "@dev",
         "netcommons/plugin-manager": "@dev",
         "netcommons/questionnaires": "@dev",
