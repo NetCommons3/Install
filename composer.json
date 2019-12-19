@@ -63,5 +63,6 @@
     "config": {
         "vendor-dir": "vendors",
         "process-timeout": 3000
-    }
+    },
+    "minimum-stability": "dev"
 }
