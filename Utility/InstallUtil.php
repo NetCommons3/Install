@@ -15,6 +15,7 @@ App::uses('Current', 'NetCommons.Utility');
 App::uses('Security', 'Utility');
 App::uses('ClassRegistry', 'Utility');
 App::uses('InstallValidatorUtil', 'Install.Utility');
+App::uses('ConnectionManager', 'Model');
 
 /**
  * Install Utility
@@ -523,6 +524,11 @@ EOF;
  * @return void
  */
 	public function saveAdminUser($data) {
+		//DataSourceの中にあるlistSources()の$this->_sources変数を初期化することができないため、reconnect()する。
+		$dataSource = ConnectionManager::getDataSource('master');
+		$dataSource->cacheSources = false;
+		$dataSource->reconnect();
+
 		//テストでMockに差し替えが必要なための処理であるので、カバレッジレポートから除外する。
 		//@codeCoverageIgnoreStart
 		if (empty($this->User) || substr(get_class($this->User), 0, 4) !== 'Mock') {
