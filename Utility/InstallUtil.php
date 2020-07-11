@@ -631,6 +631,7 @@ EOF;
 
 		//DataSourceの中にあるlistSources()の$this->_sources変数を初期化することができないため、reconnect()する。
 		$dataSource = ConnectionManager::getDataSource($connection);
+		$dataSource->cacheSources = false;
 		$dataSource->reconnect();
 
 		$Plugin = ClassRegistry::init(Hash::get($options, 'PluginModel', 'PluginManager.Plugin'));
