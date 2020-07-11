@@ -524,11 +524,6 @@ EOF;
  * @return void
  */
 	public function saveAdminUser($data) {
-		//DataSourceの中にあるlistSources()の$this->_sources変数を初期化することができないため、reconnect()する。
-		$dataSource = ConnectionManager::getDataSource('master');
-		$dataSource->cacheSources = false;
-		$dataSource->reconnect();
-
 		//テストでMockに差し替えが必要なための処理であるので、カバレッジレポートから除外する。
 		//@codeCoverageIgnoreStart
 		if (empty($this->User) || substr(get_class($this->User), 0, 4) !== 'Mock') {
@@ -665,6 +660,15 @@ EOF;
 		} else {
 			CakeLog::info('[migration] Failure migrated all plugins');
 		}
+
+		//DataSourceの中にあるlistSources()の$this->_sources変数を初期化することができないため、reconnect()する。
+		$dataSource = ConnectionManager::getDataSource('master');
+		$dataSource->cacheSources = false;
+		$dataSource->reconnect();
+
+		//キャッシュの削除
+		Cache::clear(false, '_cake_model_');
+		Cache::clear(false, '_cake_core_');
 
 		return $result;
 	}
