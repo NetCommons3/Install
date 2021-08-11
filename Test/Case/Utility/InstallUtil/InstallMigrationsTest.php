@@ -79,12 +79,18 @@ class InstallUtilityInstallUtilInstallMigrationsTest extends NetCommonsCakeTestC
 
 		$this->__initTableCount = 0;
 		foreach ($tables as $table) {
-			$tableName = array_shift($table['TABLE_NAMES']);
+			$tableName = null;
+			if (array_key_exists('TABLE_NAMES', $table)) {
+				$tableName = array_shift($table['TABLE_NAMES']);
+			} elseif (array_key_exists('TABLES', $table)) {
+				$tableName = array_shift($table['TABLES']);
+			}
+
 			if (preg_match('/schema_migrations$/', $tableName)) {
-				$db->query('DELETE FROM ' . $tableName . ' WHERE type != \'Migrations\'');
+				$db->query('DELETE FROM `' . $tableName . '` WHERE type != \'Migrations\'');
 				$this->__initTableCount++;
 			} else {
-				$db->query('DROP TABLE ' . $tableName);
+				$db->query('DROP TABLE `' . $tableName . '`');
 			}
 		}
 	}
